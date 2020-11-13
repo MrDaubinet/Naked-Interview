@@ -37,6 +37,7 @@ export default {
       // postcss({ extract: "bundle.css" }),
       // Step 4 -> Import external dependancies from node moduels
       resolve({
+        mainFields: ['module', 'main'],
         browser: true,
         dedupe: ['svelte']
       }),
