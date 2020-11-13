@@ -1,22 +1,40 @@
 <script>
-	import Nav from '../components/Nav.svelte';
+	// import Navigation from "../components/Navigation.svelte"
+	// import MobileMenue from "../components/MobileMenu.svelte"
+	// import Footer from "../components/Footer.svelte"
 
-	export let segment;
+	import { stores } from '@sapper/app';
+	const { preloading, page, session } = stores();
+
+	let show_mobile_menu = false
+
+	let showMobileMenu = () => show_mobile_menu = true
+	let hideMobileMenu = () => show_mobile_menu = false
 </script>
 
-<style>
-	main {
-		position: relative;
-		max-width: 56em;
-		background-color: white;
-		padding: 2em;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-</style>
+<div class="relative z-0 h-screen bg-gray-800">
+	<!-- Page content -->
+	<div class="relative overflow-hidden bg-gray-50">
+		<!-- Section 1 -->
+		<div class="relative pt-6 lg:pb-10 md:pt-10">
+			<!-- Navigation -->
+			<!-- <Navigation 
+				{showMobileMenu}
+			/>
+			{#if show_mobile_menu}
+				<MobileMenue 
+					{hideMobileMenu}
+				/>
+			{/if} -->
+			
+		</div>
 
-<Nav {segment}/>
+		<!-- route content -->
+		<slot></slot>
 
-<main>
-	<slot></slot>
-</main>
+		<!-- Footer -->
+		<!-- {#if $page.path != "/" || $page.path != "/contact"}
+			<Footer />
+		{/if} -->
+	</div>
+</div>
