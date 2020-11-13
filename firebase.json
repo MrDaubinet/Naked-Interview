@@ -1,11 +1,16 @@
 {
   "hosting": {
-    "site": "automated-utility-systems",
     "public": "__sapper__/export",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }

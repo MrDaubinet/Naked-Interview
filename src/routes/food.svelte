@@ -74,6 +74,10 @@
         {/each}
       </div>
     {/each}
+    <!-- text field -->
+    <div class="bg-white py-10 px-5 rounded-2xl mt-10 text-center">
+      <p>Hit "Snap" below to categorise more food items!</p>
+    </div>
   </div>
 
   <div class="absolute bottom-0 w-full flex justify-center mb-10" style="font-family: 'Roboto'">
