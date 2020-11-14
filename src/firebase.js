@@ -1,6 +1,7 @@
 import firebase from 'firebase/app';// rollup bundle issue with ESM import
-// import "firebase/firestore";
+// import 'firebase/auth';
 import 'firebase/storage'; 
+import 'firebase/firestore'; 
 
 const firebaseConfig = {
   apiKey: "AIzaSyD9cM6oiXNZlfmGu2IYLpa14jngNSWh7Yk",
@@ -17,5 +18,11 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
+// I think i can take this out
+// export const auth = firebase.auth();
 // Create a root reference
-export let storageRef = firebase.storage().ref();
+export const storageRef = firebase.storage().ref();
+export const storage_test = firebase.storage()
+// Create a db reference
+const db = firebase.firestore();
+export const dataRef = db.collection('food');

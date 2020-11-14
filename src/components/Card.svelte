@@ -4,7 +4,7 @@
   export let name
 </script>
 
-<div class="mx-2 py-1 w-50 inline-block">
-  <p class="pb-1 text-center font-semibold">{confidence}</p>
-  <img class="h-20 w-20 rounded-md object-cover" src={url} alt={name}>
+<div class="inline-block py-1 mx-2 w-50">
+  <p class="pb-1 font-semibold text-center">{confidence.toFixed(2)}</p>
+  <img class="object-cover w-20 h-20 rounded-md" src={url} alt={name}>
 </div>

@@ -1,83 +1,125 @@
 <!-- preload data -->
+<!-- <script context="module">
+	export async function preload(page, session) {
+		const { slug } = page.params;
+
+		const res = await this.fetch(`blog/${slug}.json`);
+		const article = await res.json();
+
+		return { article };
+	}
+</script> -->
+
 <script>
   import Card from "../components/Card.svelte"
   import ButtonPrimary from "../components/ButtonPrimary.svelte"
+  import { onMount } from 'svelte';
+  import { dataRef, storage_test } from "../firebase.js";
 
-  let data = [
-    {
-      name: "Hamburgers",
-      images: [
-        {
-          url: "https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/165384.jpg",
-          confidence: "98%"
-        },  {
-          url: "https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/165384.jpg",
-          confidence: "85%"
-        }, {
-          url: "https://www.simplyhappyfoodie.com/wp-content/uploads/2018/04/instant-pot-hamburgers-3.jpg",
-          confidence: "75%"
-        }, {
-          url: "https://www.simplyhappyfoodie.com/wp-content/uploads/2018/04/instant-pot-hamburgers-3.jpg",
-          confidence: "75%"
-        }, {
-          url: "https://www.simplyhappyfoodie.com/wp-content/uploads/2018/04/instant-pot-hamburgers-3.jpg",
-          confidence: "75%"
-        }, {
-          url: "https://www.simplyhappyfoodie.com/wp-content/uploads/2018/04/instant-pot-hamburgers-3.jpg",
-          confidence: "75%"
-        }
-      ]
-    }, {
-      name: "Milkshakes",
-      images: [
-        {
-          url: "https://cdn.apartmenttherapy.info/image/upload/f_auto,q_auto:eco/k%2FPhoto%2FRecipes%2F2020-07-how-to-make-a-milkshake-at-home%2F2020-06-08_AT-K19388",
-          confidence: "83%"
-        }, {
-          url: "https://www.thereciperebel.com/wp-content/uploads/2020/06/how-to-make-a-milkshake-www.thereciperebel.com-600-11-of-44.jpg",
-          confidence: "70%"
-        }
-      ]
+  let markers
+  let count
+  let grouped_images = []
+  let loaded = false
+
+  onMount(async () => {
+    markers = await getMarkers()
+    markers = await generateUrls(markers)
+    count = markers.length
+    grouped_images = groupMarkers(markers)
+    console.log(grouped_images)
+  })
+
+  async function getMarkers() {
+    // await dataRef
+    const events = await dataRef
+    return events.get().then((querySnapshot) => {
+        const tempDoc = querySnapshot.docs.map((doc) => {
+          return { id: doc.id, ...doc.data() }
+        })
+        return tempDoc 
+      })
+  }
+
+  async function generateUrls(markers) {
+    let new_markers = []
+    for(let marker of markers) {
+      let image_ref = await storage_test.refFromURL(marker.url);
+      let url = await image_ref.getDownloadURL()
+      marker.url = url+".jpg"
+      new_markers.push(marker)
     }
-  ]
+    loaded = true
+    return new_markers
+  }
 
-  function countFood(){
-    return data.reduce((item_total, item) => {
-      return item_total + item.images.length
-    }, 0)
+  function groupMarkers(markers) {
+    let data = []
+    console.log(markers.length)
+    markers.forEach(marker => {
+      // check if the data array is empty
+      if(data.length == 0 | (data.filter(category => category.name == marker.label).length == 0)) {
+        data.push({
+          name: marker.label,
+          images: [
+            {
+              url: marker.url,
+              confidence: marker.score
+            }
+          ]
+        })
+        console.log("inititalizing array")
+      } else {
+        // adding to existing category
+        data.forEach(category => {
+          if(marker.label == category.name) {
+            category.images.push({
+              url: marker.url,
+              confidence: marker.score
+            })
+          }
+        })
+      }
+    });
+    console.log("grouped")
+    console.log(data)
+    return data
   }
 </script>
 
-<div class="h-screen bg-gray-100 overflow-hidden">
+<div class="h-screen">
   <div class="px-10 pt-10 ">
     <!-- title -->
-    <div class="flex justify-between items-center">
-      <p class="text font-bold text-4xl text-gray-700">Food</p>
-      <div class="w-10 h-10 bg-gray-700 rounded-full flex justify-center items-center text-white font-medium">
-        {countFood()}
+    <div class="flex items-center justify-between">
+      <p class="text-4xl font-bold text-gray-700 text">Food</p>
+      <div class="flex items-center justify-center w-10 h-10 font-medium text-white bg-gray-700 rounded-full">
+        {count || 0}
       </div>
     </div>
-    <!-- array of categories -->
-    {#each data as item}
-      <!-- category name -->
-      <p class="text-md font-semibold mt-4 mb-2">{item.name}</p>
-      <div class="overflow-x-scroll whitespace-no-wrap w-full pl-4 ">
-        <!-- array of classified images -->
-        {#each item.images as image}
-          <Card 
-            name={item.name}
-            confidence={image.confidence}
-            url={image.url}
-          />
-        {/each}
-      </div>
-    {/each}
-    <div class="bg-white py-10 px-5 rounded-2xl mt-10 text-center">
+    {#if loaded}
+      <!-- array of categories -->
+      {#each grouped_images as item}
+        <!-- category name -->
+        <p class="mt-4 mb-2 font-semibold text-md">{item.name}</p>
+        <div class="w-full pl-4 overflow-x-scroll whitespace-no-wrap ">
+          <!-- array of classified images -->
+          {#each item.images as image}
+          <!-- {image.url} -->
+            <Card 
+              name={item.name}
+              confidence={image.confidence}
+              url={image.url}
+            />
+          {/each}
+        </div>
+      {/each}
+    {/if}
+
+    <div class="px-5 py-10 mt-10 text-center bg-white rounded-2xl">
       <p>Hit "Snap" below to categorise more food items!</p>
     </div>
   </div>
 
-  <div class="absolute bottom-0 w-full flex justify-center mb-10" style="font-family: 'Roboto'">
+  <div class="flex justify-center w-full my-10 mb-10" style="font-family: 'Roboto'">
     <a href="/photo">
       <ButtonPrimary >
         Snap
