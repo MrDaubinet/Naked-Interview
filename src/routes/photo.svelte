@@ -1,9 +1,10 @@
 <script>
   import { storageRef } from "../firebase.js";
+  import { onMount } from 'svelte';
   import moment from "moment"
 
   import ButtonPrimary from "../components/ButtonPrimary.svelte"
-  import { onMount } from 'svelte';
+  import ButtonSecondary from "../components/ButtonSecondary.svelte"
 
   let img
   let lastPicture
@@ -72,29 +73,29 @@
 
 </script>
 
-<div class="h-screen w-full bg-gray-100">
-  <div class="mx-5 pt-10">
-    <video class="rounded-lg"  autoplay></video>
+<div class="w-full h-screen bg-gray-100">
+  <div class="pt-5 mx-5">
+    <a class="pb-5 rounded-2xl" href="/food">
+      <ButtonSecondary >
+        Back
+      </ButtonSecondary>
+    </a>
+    <video class="mt-5 rounded-lg"  autoplay></video>
   </div>
   
   <div class="mx-5 {lastPicture? 'pt-10' : ''}">
     <img class="rounded-lg" src="">
     <canvas style="display:none;"></canvas>
     {#if !lastPicture}
-      <div class="bg-white py-10 px-5 rounded-2xl mt-10 text-center">
-        <p>Your Most recent photo will display above</p>
+      <div class="px-5 py-10 mt-10 text-center bg-white rounded-2xl">
+        <p>Your most recent photo will display above</p>
       </div>
     {/if}
   </div>
-  <div class="flex justify-between  pt-5 mx-5">
-    <a class="rounded-2xl" href="/food">
-      <ButtonPrimary >
-        Back
-      </ButtonPrimary>
-    </a>
+  <div class="flex justify-center pt-5 mx-5">
     <button class="rounded-2xl" on:click={takePhoto}>
       <ButtonPrimary >
-        Click for picture
+        Click for picture!
       </ButtonPrimary>
     </button>
   </div>
